@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { GetUserSettingsUseCase } from '../../../../../domain/usecases/get-user-settings.usecase';
+import { SetUserSettingsUseCase } from '../../../../../domain/usecases/set-user-settings.usecase';
 
 @Component({
   selector: 'app-header',
@@ -11,14 +13,23 @@ import { RouterModule } from '@angular/router';
 export class HeaderComponent implements OnInit {
   isDarkTheme: boolean = true;
 
+  constructor(
+    private getUserSettingsUseCase: GetUserSettingsUseCase,
+    private setUserSettingsUsecase: SetUserSettingsUseCase
+  ) {}
+
   ngOnInit(): void {
-    // TODO: Move to a service
-    this.isDarkTheme = localStorage.getItem('theme') === 'dark';
+    this.getUserSettingsUseCase.execute().subscribe({
+      next: (userSettings) => {
+        this.isDarkTheme = userSettings.theme === 'dark';
+      },
+    });
   }
 
   toggleTheme(): void {
     this.isDarkTheme = !this.isDarkTheme;
-    // TODO: Move to a service
-    localStorage.setItem('theme', this.isDarkTheme ? 'dark' : 'light');
+    this.setUserSettingsUsecase.execute({
+      theme: this.isDarkTheme ? 'dark' : 'retro',
+    });
   }
 }

@@ -16,6 +16,10 @@ import { LocationRepository } from '../domain/repositories/location.repository';
 import { GetLocationsUseCase } from '../domain/usecases/get-locations.usecase';
 import { GetLocationUseCase } from '../domain/usecases/get-location.usecase';
 import { LocationImplRepository } from './repositories/location/location-impl.repository';
+import { UserSettingsRepository } from '../domain/repositories/user-settings.repository';
+import { GetUserSettingsUseCase } from '../domain/usecases/get-user-settings.usecase';
+import { UserSettingsImplRepository } from './repositories/user-settings/location-impl.repository';
+import { SetUserSettingsUseCase } from '../domain/usecases/set-user-settings.usecase';
 
 const apolloOptionsFactory = () => {
   const httpLink = inject(HttpLink);
@@ -105,6 +109,31 @@ const locationRepositoryProvider = {
   useClass: LocationImplRepository,
 };
 
+const getUserSettingsUseCaseFactory = (
+  userSettingsRepository: UserSettingsRepository
+) => new GetUserSettingsUseCase(userSettingsRepository);
+
+const getUserSettingsUseCaseProvider = {
+  provide: GetUserSettingsUseCase,
+  useFactory: getUserSettingsUseCaseFactory,
+  deps: [UserSettingsRepository],
+};
+
+const setUserSettingsUseCaseFactory = (
+  userSettingsRepository: UserSettingsRepository
+) => new SetUserSettingsUseCase(userSettingsRepository);
+
+const setUserSettingsUseCaseProvider = {
+  provide: SetUserSettingsUseCase,
+  useFactory: setUserSettingsUseCaseFactory,
+  deps: [UserSettingsRepository],
+};
+
+const userSettingsRepositoryProvider = {
+  provide: UserSettingsRepository,
+  useClass: UserSettingsImplRepository,
+};
+
 @NgModule({
   providers: [
     graphqlProvider,
@@ -117,6 +146,9 @@ const locationRepositoryProvider = {
     getLocationsUseCaseProvider,
     getLocationUseCaseProvider,
     locationRepositoryProvider,
+    getUserSettingsUseCaseProvider,
+    setUserSettingsUseCaseProvider,
+    userSettingsRepositoryProvider,
   ],
   imports: [CommonModule],
 })
