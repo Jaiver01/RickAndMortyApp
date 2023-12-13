@@ -18,6 +18,7 @@ export const selectLoading = createSelector(
   selectCharacterState,
   (state) => state.loading
 );
+
 export const selectError = createSelector(
   selectCharacterState,
   (state) => state.error

@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import * as characterActions from './../actions/characters.actions';
+import * as characterActions from '../actions/character.actions';
 import { PaginatedDataModel } from '../../../../../domain/models/paginated-data.model';
 import { ShortCharacterModel } from '../../../../../domain/models/character.model';
 
@@ -27,6 +27,19 @@ export const initialState: CharacterState = {
 export const characterReducer = createReducer(
   initialState,
   on(characterActions.loadCharacters, (state) => ({ ...state, loading: true })),
+  on(characterActions.clearCharacters, (_) => ({
+    pagination: {
+      info: {
+        count: 0,
+        pages: 0,
+        next: 1,
+        prev: null,
+      },
+    },
+    characters: [],
+    loading: false,
+    error: null,
+  })),
   on(characterActions.loadCharactersSuccess, (state, { pagination }) => ({
     ...state,
     pagination,
