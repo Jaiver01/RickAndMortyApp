@@ -2,6 +2,7 @@ import { Mapper } from '../../../../base/mapper';
 import {
   ShortCharacterModel,
   CharacterStatus,
+  CharacterGender,
 } from '../../../../domain/models/character.model';
 import { CharacterEntity } from '../entities/character-entity';
 
@@ -13,6 +14,7 @@ export class ShortCharacterMapper extends Mapper<
     return {
       ...param,
       status: CharacterStatus[param.status],
+      gender: CharacterGender[param.gender],
     };
   }
 

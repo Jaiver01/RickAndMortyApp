@@ -9,11 +9,19 @@ export const GET_CHARACTER = gql`
       species
       type
       gender
-      origin
-      location
+      origin {
+        id
+        name
+        type
+        dimension
+      }
+      location {
+        id
+        name
+        type
+        dimension
+      }
       image
-      episode
-      url
       created
     }
   }

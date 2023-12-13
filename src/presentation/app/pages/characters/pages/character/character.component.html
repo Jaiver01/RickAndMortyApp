@@ -1,0 +1,43 @@
+<div class="mt-14 sm:mt-24 py-8 container mx-auto">
+  <div class="hero justify-start">
+    <div class="hero-content flex-col lg:flex-row">
+      @if (isLoading) {
+        <ngx-skeleton-loader appearance="custom-content" [theme]="{height: '300px', width: '300px'}"></ngx-skeleton-loader>
+        <div class="flex flex-col">
+          <ngx-skeleton-loader appearance="custom-content" [theme]="{height: '36px', width: '256px'}"></ngx-skeleton-loader>
+          <ngx-skeleton-loader appearance="custom-content" [theme]="{height: '28px', width: '128px'}"></ngx-skeleton-loader>
+          <ngx-skeleton-loader appearance="custom-content" [theme]="{height: '28px', width: '256px'}"></ngx-skeleton-loader>
+        </div>
+      } @else {
+        <img [src]="character?.image" class="max-w-sm rounded-lg shadow-2xl" [alt]="character?.name" />
+        <div>
+          <h1 class="text-5xl font-bold">{{ character?.name }}</h1>
+          <ul>
+            <li>Status: {{ character?.status }}</li>
+            <li>Species: {{ character?.species }}</li>
+            @if (character?.type != '') {
+              <li>Type: {{ character?.type }}</li>
+            }
+            <li>Gender: {{ character?.gender }}</li>
+            <li>
+              Origin:
+              @if (character?.origin?.id != null) {
+                <a class="text-blue-600 hover:text-blue-700" [routerLink]="['/locations', character?.origin?.id]">{{ character?.origin?.name }}</a>
+              } @else {
+                {{ character?.origin?.name }}
+              }
+            </li>
+            <li>
+              Location:
+              @if (character?.location?.id != null) {
+                <a class="text-blue-600 hover:text-blue-700" [routerLink]="['/locations', character?.location?.id]">{{ character?.location?.name }}</a>
+              } @else {
+                {{ character?.location?.name }}
+              }
+            </li>
+          </ul>        
+        </div>
+      }
+    </div>
+  </div>
+</div>

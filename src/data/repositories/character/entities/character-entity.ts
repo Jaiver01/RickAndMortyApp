@@ -1,3 +1,5 @@
+import { LocationEntity } from '../../location/entities/location-entity';
+
 export interface CharacterEntity {
   id: number;
   name: string;
@@ -5,15 +7,10 @@ export interface CharacterEntity {
   species: string;
   type: string;
   gender: 'Female' | 'Male' | 'Genderless' | 'unknown';
-  origin: CharacterLocation;
-  location: CharacterLocation;
+  origin: LocationEntity;
+  location: LocationEntity;
   image: string;
   episode: string[];
   url: string;
   created: string;
-}
-
-interface CharacterLocation {
-  name: string;
-  url: string;
 }

@@ -1,16 +1,17 @@
+import { LocationModel } from './location.model';
 import { ResourceBase } from './resource-base';
 
 export enum CharacterStatus {
-  Dead = 'Muerto',
-  Alive = 'Vivo',
-  unknown = 'Desconocido',
+  Dead = 'Dead',
+  Alive = 'Alive',
+  unknown = 'unknown',
 }
 
 export enum CharacterGender {
-  Female = 'Femenino',
-  Male = 'Masculino',
-  Genderless = 'Sin género',
-  unknown = 'Desconocido',
+  Female = 'Female',
+  Male = 'Male',
+  Genderless = 'Genderless',
+  unknown = 'unknown',
 }
 
 export interface CharacterModel extends ResourceBase {
@@ -18,8 +19,8 @@ export interface CharacterModel extends ResourceBase {
   species: string;
   type: string;
   gender: CharacterGender;
-  origin: CharacterLocation;
-  location: CharacterLocation;
+  origin: LocationModel;
+  location: LocationModel;
   image: string;
   episode: string[];
 }
@@ -28,12 +29,8 @@ export interface ShortCharacterModel {
   id: number;
   name: string;
   status: CharacterStatus;
+  gender: CharacterGender;
   image: string;
-}
-
-interface CharacterLocation {
-  name: string;
-  url: string;
 }
 
 export interface CharacterFilter {

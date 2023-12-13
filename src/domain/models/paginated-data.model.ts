@@ -2,8 +2,8 @@ export interface PaginatedDataModel<T> {
   info?: {
     count: number;
     pages: number;
-    next: string | null;
-    prev: string | null;
+    next: number | null;
+    prev: number | null;
   };
   data?: T[];
 }

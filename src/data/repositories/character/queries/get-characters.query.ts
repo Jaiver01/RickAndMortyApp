@@ -13,6 +13,7 @@ export const GET_CHARACTERS = gql`
         id
         name
         status
+        gender
         image
       }
     }
