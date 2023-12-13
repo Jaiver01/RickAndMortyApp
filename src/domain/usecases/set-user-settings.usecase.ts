@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
 import { UseCase } from '../base/use-case';
 import { UserSettingsRepository } from '../repositories/user-settings.repository';
 import { UserSettings } from '../models/user-settings.model';
@@ -18,9 +18,6 @@ export class SetUserSettingsUseCase implements UseCase<UserSettings, void> {
       },
     });
 
-    return new Observable((observer) => {
-      observer.next();
-      observer.complete();
-    });
+    return EMPTY;
   }
 }
