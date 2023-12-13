@@ -9,6 +9,7 @@ export interface EpisodeModel extends ResourceBase {
 export interface ShortEpisodeModel {
   id: number;
   name: string;
+  airDate: string;
   episode: string;
 }
 

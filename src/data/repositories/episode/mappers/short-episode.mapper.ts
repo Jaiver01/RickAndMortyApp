@@ -9,6 +9,7 @@ export class ShortEpisodeMapper extends Mapper<
   override mapFrom(param: EpisodeEntity): ShortEpisodeModel {
     return {
       ...param,
+      airDate: param.air_date,
     };
   }
 
