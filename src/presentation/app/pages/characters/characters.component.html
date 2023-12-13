@@ -1,26 +1,10 @@
 <div class="mt-14 sm:mt-24 py-8 container mx-auto flex flex-col lg:flex-row">
   <section class="w-full lg:w-1/4 lg:max-w-[260px] px-1.5">
-    <app-filters-section></app-filters-section>
-  </section>
-  <section class="w-full">
-    <div class="p-2">
-      <div class="flex flex-wrap justify-center gap-8" infinite-scroll (scrolled)="onScrollDown()">
-        @for (character of characters; track $index) {
-          <app-character-card [character]="character"></app-character-card>
-        } @empty {
-          @if(!isLoading) {
-            <div class="text-center">
-              <h1 class="text-2xl">No characters found</h1>
-            </div>
-          }
-        }
-  
-        @if(isLoading) {
-          <app-character-card-skeleton></app-character-card-skeleton>
-          <app-character-card-skeleton></app-character-card-skeleton>
-          <app-character-card-skeleton></app-character-card-skeleton>
-        }
-      </div>
+    <div class="lg:fixed w-full lg:max-w-[260px]">
+      <app-filters-section></app-filters-section>
     </div>
+  </section>
+  <section class="w-full" infinite-scroll [infiniteScrollDistance]="0.5" [infiniteScrollDisabled]="(isLoading$ | async) ?? false" (scrolled)="onScrollDown()">
+    <app-character-list></app-character-list>
   </section>
 </div>

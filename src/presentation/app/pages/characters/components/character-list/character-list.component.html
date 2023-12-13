@@ -1,0 +1,19 @@
+<div class="p-2">
+  <div class="flex flex-wrap justify-center gap-8">
+    @for (character of characters$ | async; track $index) {
+      <app-character-card [character]="character"></app-character-card>
+    } @empty {
+      @if(!(isLoading$ | async)) {
+        <div class="text-center">
+          <h1 class="text-2xl">No characters found</h1>
+        </div>
+      }
+    }
+
+    @if(isLoading$ | async) {
+      <app-character-card-skeleton></app-character-card-skeleton>
+      <app-character-card-skeleton></app-character-card-skeleton>
+      <app-character-card-skeleton></app-character-card-skeleton>
+    }
+  </div>
+</div>

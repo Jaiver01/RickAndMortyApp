@@ -1,45 +1,56 @@
 import { Component, OnInit } from '@angular/core';
-import { GetCharactersUseCase } from '../../../../domain/usecases/get-characters.usecase';
+import { CommonModule } from '@angular/common';
 import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
 import { ShortCharacterModel } from '../../../../domain/models/character.model';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
-import { CharacterCardSkeletonComponent } from './components/character-card-skeleton/character-card-skeleton.component';
-import { CharacterCardComponent } from './components/character-card/character-card.component';
 import { FiltersSectionComponent } from '../../shared/components/filters-section/filters-section.component';
+import { Observable, Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import {
+  selectLoading,
+  selectPagination,
+} from '../../core/store/selectors/character.selectors';
+import { loadCharacters } from '../../core/store/actions/characters.actions';
+import { CharacterListComponent } from './components/character-list/character-list.component';
 
 @Component({
   selector: 'app-characters',
   standalone: true,
   imports: [
+    CommonModule,
     InfiniteScrollModule,
-    CharacterCardComponent,
-    CharacterCardSkeletonComponent,
+    CharacterListComponent,
     FiltersSectionComponent,
   ],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss',
 })
 export class CharactersComponent implements OnInit {
-  pagination: PaginatedDataModel<ShortCharacterModel> = {
-    info: {
-      count: 0,
-      pages: 0,
-      next: 1,
-      prev: null,
-    },
-  };
+  isLoading$: Observable<boolean>;
 
-  characters: ShortCharacterModel[] = [];
-  isLoading: boolean = false;
+  private pagination: PaginatedDataModel<ShortCharacterModel> = {};
+  private paginationSubscription: Subscription;
 
-  constructor(private getCharactersUseCase: GetCharactersUseCase) {}
+  constructor(private store: Store) {
+    this.isLoading$ = this.store.select(selectLoading);
+
+    this.paginationSubscription = this.store
+      .select(selectPagination)
+      .subscribe({
+        next: (pagination) => (this.pagination = pagination),
+      });
+  }
 
   ngOnInit(): void {
-    this.getCharacters(1);
+    this.getCharacters(this.pagination.info?.next ?? 1);
+  }
+
+  ngOnDestroy(): void {
+    this.paginationSubscription.unsubscribe();
   }
 
   onScrollDown(): void {
-    if (this.isLoading || !this.pagination.info?.next) {
+    if (!this.pagination.info?.next) {
       return;
     }
 
@@ -47,21 +58,6 @@ export class CharactersComponent implements OnInit {
   }
 
   getCharacters(page: number): void {
-    this.isLoading = true;
-
-    this.getCharactersUseCase.execute({ page }).subscribe({
-      next: (paginatedCharacters) => {
-        if (paginatedCharacters.data?.length) {
-          this.pagination = paginatedCharacters;
-          this.characters.push(...paginatedCharacters.data);
-        }
-
-        this.isLoading = false;
-      },
-      error: (err) => {
-        // TODO: handle error
-        console.error('Error: ' + err.message);
-      },
-    });
+    this.store.dispatch(loadCharacters({ page }));
   }
 }
