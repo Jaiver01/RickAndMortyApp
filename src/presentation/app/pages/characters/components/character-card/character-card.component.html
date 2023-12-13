@@ -1,0 +1,17 @@
+<a class="card w-72 bg-base-100 shadow-xl" [routerLink]="['/characters', character!.id]">
+  <figure>
+    <img [src]="character!.image" class="w-full h-full" [alt]="character!.name" />
+  </figure>
+  <div class="card-body p-4 relative gap-0">
+    <div
+      class="badge text-gray-300 font-bold absolute -top-3 right-3"
+      [class.badge-success]="character!.status === 'Alive'"
+      [class.badge-error]="character!.status === 'Dead'"
+      [class.badge-info]="character!.status === 'unknown'"
+    >
+      {{ character!.status }}
+    </div>
+    <h2 class="card-title">{{ character!.name }}</h2>
+    <p>Gender: {{ character!.gender }}</p>
+  </div>
+</a>
