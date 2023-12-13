@@ -1,0 +1,29 @@
+<div class="mt-14 sm:mt-24 py-8 container mx-auto flex flex-col lg:flex-row">
+	<section class="w-full lg:w-1/4 lg:max-w-[260px] px-1.5">
+		<app-filters-section></app-filters-section>
+	</section>
+	<section class="w-full">
+		<div class="overflow-x-auto h-96" infinite-scroll [scrollWindow]="false" (scrolled)="onScrollDown()">
+			<table class="table table-pin-rows" aria-describedby="List of episodes">
+				<thead>
+					<tr>
+						<th scope="row" class="text-lg">Name</th>
+						<th scope="row" class="text-lg">Type</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (location of locations; track $index) {
+						<tr>
+							<td>
+								<a class="block w-full" [routerLink]="['/locations', location.id]">{{ location.name }}</a>
+							</td>
+							<td>
+								<a class="block w-full" [routerLink]="['/locations', location.id]">{{ location.type }}</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</section>
+</div>

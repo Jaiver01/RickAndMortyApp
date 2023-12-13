@@ -7,8 +7,6 @@ export const GET_LOCATION = gql`
       name
       type
       dimension
-      residents
-      url
       created
     }
   }
