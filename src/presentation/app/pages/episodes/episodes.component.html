@@ -3,9 +3,9 @@
     <app-filters-section></app-filters-section>
   </section>
   <section class="w-full">
-    <div class="overflow-x-auto h-96" infinite-scroll [scrollWindow]="false" (scrolled)="onScrollDown()">
+    <div class="overflow-x-auto h-96" infinite-scroll [infiniteScrollDisabled]="(isLoading$ | async) ?? false" [scrollWindow]="false" (scrolled)="onScrollDown()">
       <table class="table table-pin-rows" aria-describedby="List of episodes">
-        @for (season of seasons; track $index) {
+        @for (season of seasons$ | async; track $index) {
           <thead>
             <tr>
               <th colspan="3" scope="row" class="text-lg">Season {{ $index + 1 }}</th>

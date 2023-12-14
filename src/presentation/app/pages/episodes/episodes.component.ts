@@ -1,39 +1,74 @@
 import { Component, OnInit } from '@angular/core';
-import { GetEpisodesUseCase } from '../../../../domain/usecases/get-episodes.usecase';
-import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
-import { ShortEpisodeModel } from '../../../../domain/models/episode.model';
+import { Store } from '@ngrx/store';
+import { CommonModule } from '@angular/common';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { Observable, Subscription, map } from 'rxjs';
+import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
+import {
+  EpisodeFilter,
+  ShortEpisodeModel,
+} from '../../../../domain/models/episode.model';
 import { FiltersSectionComponent } from '../../shared/components/filters-section/filters-section.component';
+import { setCurrentPage } from '../../core/store/actions/filter.actions';
+import {
+  selectEpisodes,
+  selectLoading,
+  selectPagination,
+} from '../../core/store/selectors/episode.selectors';
+import { selectFilters } from '../../core/store/selectors/filter.selectors';
+import { loadEpisodes } from '../../core/store/actions/episode.actions';
 
 @Component({
   selector: 'app-episodes',
   standalone: true,
-  imports: [InfiniteScrollModule, FiltersSectionComponent],
+  imports: [CommonModule, InfiniteScrollModule, FiltersSectionComponent],
   templateUrl: './episodes.component.html',
   styleUrl: './episodes.component.scss',
 })
 export class EpisodesComponent implements OnInit {
-  pagination: PaginatedDataModel<ShortEpisodeModel> = {
-    info: {
-      count: 0,
-      pages: 0,
-      next: 1,
-      prev: null,
-    },
-  };
+  isLoading$: Observable<boolean>;
+  seasons$: Observable<{ title: string; episodes: ShortEpisodeModel[] }[]>;
 
-  episodes: ShortEpisodeModel[] = [];
-  seasons: { title: string; episodes: ShortEpisodeModel[] }[] = [];
-  isLoading: boolean = false;
+  private pagination: PaginatedDataModel<ShortEpisodeModel> = {};
+  private paginationSubscription: Subscription;
+  private filters: EpisodeFilter = {};
+  private filtersSubscription: Subscription;
 
-  constructor(private getEpisodesUseCase: GetEpisodesUseCase) {}
+  constructor(private store: Store) {
+    this.store.dispatch(setCurrentPage({ page: 'episodes' }));
+
+    this.isLoading$ = this.store.select(selectLoading);
+    this.seasons$ = this.store.select(selectEpisodes).pipe(
+      map((episodes) => {
+        return this.parseEpisodes(episodes);
+      })
+    );
+
+    this.paginationSubscription = this.store
+      .select(selectPagination)
+      .subscribe({
+        next: (pagination) => (this.pagination = pagination),
+      });
+
+    this.filtersSubscription = this.store.select(selectFilters).subscribe({
+      next: (filters) => (this.filters = filters.characters),
+    });
+  }
 
   ngOnInit(): void {
-    this.getEpisodes(1);
+    console.log(this.pagination);
+    if (this.pagination.info?.next === 1) {
+      this.getEpisodes(1);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.paginationSubscription.unsubscribe();
+    this.filtersSubscription.unsubscribe();
   }
 
   onScrollDown(): void {
-    if (this.isLoading || !this.pagination.info?.next) {
+    if (!this.pagination.info?.next) {
       return;
     }
 
@@ -41,27 +76,11 @@ export class EpisodesComponent implements OnInit {
   }
 
   getEpisodes(page: number): void {
-    this.isLoading = true;
-
-    this.getEpisodesUseCase.execute({ page }).subscribe({
-      next: (paginatedEpisodes) => {
-        if (paginatedEpisodes.data?.length) {
-          this.pagination = paginatedEpisodes;
-          this.episodes.push(...paginatedEpisodes.data);
-          this.parseEpisodes(this.episodes);
-        }
-
-        this.isLoading = false;
-      },
-      error: (err) => {
-        // TODO: handle error
-        console.error('Error: ' + err.message);
-      },
-    });
+    this.store.dispatch(loadEpisodes({ page, filters: this.filters }));
   }
 
-  parseEpisodes(episodes: ShortEpisodeModel[]): void {
-    this.seasons = episodes.reduce(function (
+  parseEpisodes(episodes: ShortEpisodeModel[]) {
+    return episodes.reduce(function (
       acc: { title: string; episodes: ShortEpisodeModel[] }[],
       episode
     ) {

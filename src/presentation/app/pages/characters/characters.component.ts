@@ -55,7 +55,7 @@ export class CharactersComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.pagination.info?.next || this.pagination.info?.next === 1) {
+    if (this.pagination.info?.next === 1) {
       this.getCharacters(1);
     }
   }
