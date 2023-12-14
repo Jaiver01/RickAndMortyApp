@@ -30,9 +30,9 @@ export const filterReducer = createReducer(
   on(filterActions.setFilters, (state, filters) => ({
     ...state,
     filters: {
-      characters: { ...state.filters.characters, ...filters.characters },
-      episodes: { ...state.filters.episodes, ...filters.episodes },
-      locations: { ...state.filters.locations, ...filters.locations },
+      characters: filters.characters ?? {},
+      episodes: filters.episodes ?? {},
+      locations: filters.locations ?? {},
     },
   }))
 );

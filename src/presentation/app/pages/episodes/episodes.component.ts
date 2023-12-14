@@ -51,12 +51,11 @@ export class EpisodesComponent implements OnInit {
       });
 
     this.filtersSubscription = this.store.select(selectFilters).subscribe({
-      next: (filters) => (this.filters = filters.characters),
+      next: (filters) => (this.filters = filters.episodes),
     });
   }
 
   ngOnInit(): void {
-    console.log(this.pagination);
     if (this.pagination.info?.next === 1) {
       this.getEpisodes(1);
     }

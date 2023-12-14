@@ -9,7 +9,6 @@ import {
   ShortLocationModel,
 } from '../../../../domain/models/location.model';
 import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
-import { GetLocationsUseCase } from '../../../../domain/usecases/get-locations.usecase';
 import { FiltersSectionComponent } from '../../shared/components/filters-section/filters-section.component';
 import { setCurrentPage } from '../../core/store/actions/filter.actions';
 import {
@@ -41,10 +40,7 @@ export class LocationsComponent implements OnInit {
   private filters: LocationFilter = {};
   private filtersSubscription: Subscription;
 
-  constructor(
-    private store: Store,
-    private getLocationsUseCase: GetLocationsUseCase
-  ) {
+  constructor(private store: Store) {
     this.store.dispatch(setCurrentPage({ page: 'locations' }));
 
     this.isLoading$ = this.store.select(selectLoading);
@@ -57,7 +53,7 @@ export class LocationsComponent implements OnInit {
       });
 
     this.filtersSubscription = this.store.select(selectFilters).subscribe({
-      next: (filters) => (this.filters = filters.characters),
+      next: (filters) => (this.filters = filters.locations),
     });
   }
 

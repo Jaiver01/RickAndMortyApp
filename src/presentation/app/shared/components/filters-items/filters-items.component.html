@@ -1,0 +1,23 @@
+<div>
+  @for (filter of filtersContentPage; track $index) {
+    <details class="collapse collapse-plus border-b border-b-gray-600 rounded-none">
+      <summary class="collapse-title text-md font-semibold pl-0 pr-6">{{ filter.title }}</summary>
+      <div class="collapse-content px-0">
+        <ul>
+          @for (option of filter.options; track $index) {
+            <li class="py-0.5">
+              <label class="flex items-center">
+                <input type="radio" class="radio" [name]="filter.title + index" (change)="onSelectFilter(filter, option)" [checked]="option === filter.selected" />
+                <span class="ml-2">{{ option | titlecase }}</span>
+              </label>
+            </li>
+          }
+        </ul>
+      </div>
+    </details>
+  }
+
+  <div class="py-5 text-center">
+    <button class="btn btn-neutral" (click)="clearFilters()">Clear filters</button>
+  </div>
+</div>
