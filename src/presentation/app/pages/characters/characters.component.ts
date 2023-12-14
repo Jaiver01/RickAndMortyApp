@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
-import { ShortCharacterModel } from '../../../../domain/models/character.model';
+import {
+  CharacterFilter,
+  ShortCharacterModel,
+} from '../../../../domain/models/character.model';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { FiltersSectionComponent } from '../../shared/components/filters-section/filters-section.component';
 import { Observable, Subscription } from 'rxjs';
@@ -10,8 +13,10 @@ import {
   selectLoading,
   selectPagination,
 } from '../../core/store/selectors/character.selectors';
-import { loadCharacters } from '../../core/store/actions/characters.actions';
+import { loadCharacters } from '../../core/store/actions/character.actions';
 import { CharacterListComponent } from './components/character-list/character-list.component';
+import { setCurrentPage } from '../../core/store/actions/filter.actions';
+import { selectFilters } from '../../core/store/selectors/filter.selectors';
 
 @Component({
   selector: 'app-characters',
@@ -30,8 +35,12 @@ export class CharactersComponent implements OnInit {
 
   private pagination: PaginatedDataModel<ShortCharacterModel> = {};
   private paginationSubscription: Subscription;
+  private filters: CharacterFilter = {};
+  private filtersSubscription: Subscription;
 
   constructor(private store: Store) {
+    this.store.dispatch(setCurrentPage({ page: 'characters' }));
+
     this.isLoading$ = this.store.select(selectLoading);
 
     this.paginationSubscription = this.store
@@ -39,14 +48,21 @@ export class CharactersComponent implements OnInit {
       .subscribe({
         next: (pagination) => (this.pagination = pagination),
       });
+
+    this.filtersSubscription = this.store.select(selectFilters).subscribe({
+      next: (filters) => (this.filters = filters.characters),
+    });
   }
 
   ngOnInit(): void {
-    this.getCharacters(this.pagination.info?.next ?? 1);
+    if (!this.pagination.info?.next || this.pagination.info?.next === 1) {
+      this.getCharacters(1);
+    }
   }
 
   ngOnDestroy(): void {
     this.paginationSubscription.unsubscribe();
+    this.filtersSubscription.unsubscribe();
   }
 
   onScrollDown(): void {
@@ -58,6 +74,6 @@ export class CharactersComponent implements OnInit {
   }
 
   getCharacters(page: number): void {
-    this.store.dispatch(loadCharacters({ page }));
+    this.store.dispatch(loadCharacters({ page, filters: this.filters }));
   }
 }
