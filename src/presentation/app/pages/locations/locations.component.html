@@ -3,7 +3,7 @@
 		<app-filters-section></app-filters-section>
 	</section>
 	<section class="w-full">
-		<div class="overflow-x-auto h-96" infinite-scroll [scrollWindow]="false" (scrolled)="onScrollDown()">
+		<div class="overflow-x-auto h-96" infinite-scroll [scrollWindow]="false" [infiniteScrollDisabled]="(isLoading$ | async) ?? false" (scrolled)="onScrollDown()">
 			<table class="table table-pin-rows" aria-describedby="List of episodes">
 				<thead>
 					<tr>
@@ -12,7 +12,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@for (location of locations; track $index) {
+					@for (location of locations$ | async; track $index) {
 						<tr>
 							<td>
 								<a class="block w-full" [routerLink]="['/locations', location.id]">{{ location.name }}</a>

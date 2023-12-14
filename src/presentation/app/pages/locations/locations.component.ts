@@ -1,39 +1,79 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ShortLocationModel } from '../../../../domain/models/location.model';
+import { Store } from '@ngrx/store';
+import { CommonModule } from '@angular/common';
+import { Observable, Subscription } from 'rxjs';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import {
+  LocationFilter,
+  ShortLocationModel,
+} from '../../../../domain/models/location.model';
 import { PaginatedDataModel } from '../../../../domain/models/paginated-data.model';
 import { GetLocationsUseCase } from '../../../../domain/usecases/get-locations.usecase';
 import { FiltersSectionComponent } from '../../shared/components/filters-section/filters-section.component';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { setCurrentPage } from '../../core/store/actions/filter.actions';
+import {
+  selectLoading,
+  selectLocations,
+  selectPagination,
+} from '../../core/store/selectors/location.selectors';
+import { selectFilters } from '../../core/store/selectors/filter.selectors';
+import { loadLocations } from '../../core/store/actions/location.actions';
 
 @Component({
   selector: 'app-locations',
   standalone: true,
-  imports: [RouterModule, InfiniteScrollModule, FiltersSectionComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    InfiniteScrollModule,
+    FiltersSectionComponent,
+  ],
   templateUrl: './locations.component.html',
   styleUrl: './locations.component.scss',
 })
 export class LocationsComponent implements OnInit {
-  pagination: PaginatedDataModel<ShortLocationModel> = {
-    info: {
-      count: 0,
-      pages: 0,
-      next: 1,
-      prev: null,
-    },
-  };
+  isLoading$: Observable<boolean>;
+  locations$: Observable<ShortLocationModel[]>;
 
-  locations: ShortLocationModel[] = [];
-  isLoading: boolean = false;
+  private pagination: PaginatedDataModel<ShortLocationModel> = {};
+  private paginationSubscription: Subscription;
+  private filters: LocationFilter = {};
+  private filtersSubscription: Subscription;
 
-  constructor(private getLocationsUseCase: GetLocationsUseCase) {}
+  constructor(
+    private store: Store,
+    private getLocationsUseCase: GetLocationsUseCase
+  ) {
+    this.store.dispatch(setCurrentPage({ page: 'locations' }));
+
+    this.isLoading$ = this.store.select(selectLoading);
+    this.locations$ = this.store.select(selectLocations);
+
+    this.paginationSubscription = this.store
+      .select(selectPagination)
+      .subscribe({
+        next: (pagination) => (this.pagination = pagination),
+      });
+
+    this.filtersSubscription = this.store.select(selectFilters).subscribe({
+      next: (filters) => (this.filters = filters.characters),
+    });
+  }
 
   ngOnInit(): void {
-    this.getLocations(1);
+    if (this.pagination.info?.next === 1) {
+      this.getLocations(1);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.paginationSubscription.unsubscribe();
+    this.filtersSubscription.unsubscribe();
   }
 
   onScrollDown(): void {
-    if (this.isLoading || !this.pagination.info?.next) {
+    if (!this.pagination.info?.next) {
       return;
     }
 
@@ -41,21 +81,6 @@ export class LocationsComponent implements OnInit {
   }
 
   getLocations(page: number): void {
-    this.isLoading = true;
-
-    this.getLocationsUseCase.execute({ page }).subscribe({
-      next: (paginatedLocations) => {
-        if (paginatedLocations.data?.length) {
-          this.pagination = paginatedLocations;
-          this.locations.push(...paginatedLocations.data);
-        }
-
-        this.isLoading = false;
-      },
-      error: (err) => {
-        // TODO: handle error
-        console.error('Error: ' + err.message);
-      },
-    });
+    this.store.dispatch(loadLocations({ page, filters: this.filters }));
   }
 }
