@@ -34,6 +34,16 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 &nbsp;
 
+### Screnshots
+
+![Screenshot home page](src/assets/screenshots/1.png)
+
+![Screenshot characters page dark theme](src/assets/screenshots/2.png)
+
+![Screenshot characters page light theme](src/assets/screenshots/3.png)
+
+&nbsp;
+
 ---
 
 ⌨️ by [Jaiver Ariza](https://github.com/Jaiver01)
